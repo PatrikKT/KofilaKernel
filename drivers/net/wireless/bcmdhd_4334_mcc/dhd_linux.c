@@ -3391,7 +3391,7 @@ printf("Read PCBID = %x\n", system_rev);
 	strcpy(nvram_path, "/system/etc/calibration.gpio4");
 #endif
 
-#ifdef CONFIG_MACH_DUMMY
+#ifdef CONFIG_MACH_ZARA_CL
 	strcpy(nvram_path, "/system/etc/calibration.gpio4");
 #endif
 
@@ -4172,6 +4172,9 @@ dhd_preinit_ioctls(dhd_pub_t *dhd)
 	}
 	if ((!op_mode && strstr(fw_path, "_apsta") != NULL) ||
 		(op_mode == DHD_FLAG_HOSTAP_MODE)) {
+#ifdef DHDTCPACK_SUPPRESS
+		dhd_use_tcpack_suppress = FALSE;
+#endif
         ampdu_ba_wsize = CUSTOM_AP_AMPDU_BA_WSIZE;
 #ifdef SET_RANDOM_MAC_SOFTAP
 		uint rand_mac;
@@ -4211,6 +4214,9 @@ dhd_preinit_ioctls(dhd_pub_t *dhd)
 	}
 	else {
 		uint32 concurrent_mode = 0;
+#ifdef DHDTCPACK_SUPPRESS
+		dhd_use_tcpack_suppress = TRUE;
+#endif
 		if ((!op_mode && strstr(fw_path, "_p2p") != NULL) ||
 			(op_mode == DHD_FLAG_P2P_MODE)) {
 #if defined(ARP_OFFLOAD_SUPPORT)

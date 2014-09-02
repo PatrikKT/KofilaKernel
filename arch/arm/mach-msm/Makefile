@@ -430,7 +430,7 @@ board-t6wl-all-objs += board-t6china-camera.o
 board-t6whl-all-objs += board-t6china-camera.o
 board-t6uhl-all-objs += board-t6china-camera.o
 obj-$(CONFIG_MACH_ZARA) += board-zara-camera.o
-obj-$(CONFIG_MACH_DUMMY) += board-zara_cl-camera.o
+obj-$(CONFIG_MACH_ZARA_CL) += board-zara_cl-camera.o
 obj-$(CONFIG_MACH_DUMMY) += board-zara_cl-camera.o
 obj-$(CONFIG_MACH_DUMMY) += board-cp5_wl-camera.o
 endif
@@ -555,10 +555,10 @@ obj-$(CONFIG_MACH_ZARA) += htc_bdaddress.o board-zara-rfkill.o htc_sleep_clk.o h
 obj-$(CONFIG_MACH_ZARA) += board-zara-keypad.o
 obj-$(CONFIG_MACH_ZARA) += board-zara-mmc.o board-zara-wifi.o htc_wifi_nvs.o
 
-obj-$(CONFIG_MACH_DUMMY) += board-zara_cl.o board-zara_cl-all.o board-zara_cl-regulator.o board-zara_cl-audio.o
-obj-$(CONFIG_MACH_DUMMY) += htc_bdaddress.o board-zara_cl-rfkill.o htc_sleep_clk.o htc_util.o
-obj-$(CONFIG_MACH_DUMMY) += board-zara_cl-keypad.o
-obj-$(CONFIG_MACH_DUMMY) += board-zara_cl-mmc.o board-zara_cl-wifi.o htc_wifi_nvs.o
+obj-$(CONFIG_MACH_ZARA_CL) += board-zara_cl.o board-zara_cl-all.o board-zara_cl-regulator.o board-zara_cl-audio.o
+obj-$(CONFIG_MACH_ZARA_CL) += htc_bdaddress.o board-zara_cl-rfkill.o htc_sleep_clk.o htc_util.o
+obj-$(CONFIG_MACH_ZARA_CL) += board-zara_cl-keypad.o
+obj-$(CONFIG_MACH_ZARA_CL) += board-zara_cl-mmc.o board-zara_cl-wifi.o htc_wifi_nvs.o
 
 obj-$(CONFIG_MACH_DUMMY) += board-zara_cl.o board-zara_cl-all.o board-zara_cl-regulator.o board-zara_cl-audio.o
 obj-$(CONFIG_MACH_DUMMY) += htc_bdaddress.o board-zara_cl-rfkill.o htc_sleep_clk.o htc_util.o

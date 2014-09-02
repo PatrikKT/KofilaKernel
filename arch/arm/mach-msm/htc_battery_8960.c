@@ -418,7 +418,7 @@ int htc_charger_event_notify(enum htc_charger_event event)
 		htc_batt_schedule_batt_info_update();
 		break;
 	case HTC_CHARGER_EVENT_VBUS_OUT:
-	case HTC_CHARGER_EVENT_SRC_NONE: 
+	case HTC_CHARGER_EVENT_SRC_NONE:
 		latest_chg_src = CHARGER_BATTERY;
 		htc_batt_schedule_batt_info_update();
 		break;
@@ -1607,10 +1607,10 @@ static void batt_level_adjust(unsigned long time_since_last_update_ms)
 				if (99 < htc_batt_info.rep.level)
 					htc_batt_info.rep.level = 99; 
 				else if (prev_level < htc_batt_info.rep.level) {
-						if(time_since_last_update_ms >
-								CHG_ONE_PERCENT_LIMIT_PERIOD_MS)
-							htc_batt_info.rep.level = prev_level + 1;
-						else
+					if(time_since_last_update_ms >
+							CHG_ONE_PERCENT_LIMIT_PERIOD_MS)
+						htc_batt_info.rep.level = prev_level + 1;
+					else
 							htc_batt_info.rep.level = prev_level;
 				}
 			}

@@ -451,12 +451,6 @@ config MACH_ZARA
 	help
 	  Support for the HTC ZARA
 
-config MACH_ZARA_CL
-	depends on ARCH_MSM8930
-	bool "ZARA_CL"
-	help
-	  Support for the HTC ZARA_CL
-
 config MACH_K2_UL
 	depends on ARCH_MSM8930
 	bool "K2_UL"

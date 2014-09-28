@@ -169,7 +169,7 @@ void zara_init_gpu(void)
 	
 
 	if (cpu_is_msm8930aa())
-		kgsl_3d0_pdata.pwrlevel[0].gpu_freq = 450000000;
+		kgsl_3d0_pdata.pwrlevel[0].gpu_freq = 533333000;
 
 	
 

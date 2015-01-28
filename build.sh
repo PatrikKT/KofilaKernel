@@ -10,12 +10,6 @@ export ARCH=arm
 export CROSS_COMPILE=arm-eabi-
 
 tput setaf 6
-echo -e "\nCleaning up"
-tput sgr0
-make clean mrproper > /dev/null
-rm -r installer/system/lib/modules/*
-
-tput setaf 6
 echo -e "\nStarting compilation\n"
 tput sgr0
 make -j8 zara_defconfig
@@ -42,7 +36,9 @@ ZIP_NAME=Kofila-Installer-Zara-V3.zip
 if [ -e $ZIP_NAME ]; then
 	rm -r $ZIP_NAME
 fi
-zip -r $ZIP_NAME installer > /dev/null
+cd installer
+zip -r ../$ZIP_NAME * > /dev/null
+cd ..
 
 tput setaf 2
 echo -e "\nPackage completed: $ZIP_NAME"

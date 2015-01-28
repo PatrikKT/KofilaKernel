@@ -1,0 +1,107 @@
+set_progress(0.0);
+ui_print("");
+ui_print("Installing KofilaKernel...");
+set_progress(0.1);
+
+ifelse(is_mounted("/system") == "/system", unmount("/system"));
+ifelse(is_mounted("/cache") == "/cache", unmount("/cache"));
+
+ui_print("Wiping /cache");
+run_program("/sbin/busybox", "mount", "/cache");
+delete_recursive("/cache/");
+run_program("/sbin/busybox", "umount", "/cache");
+
+
+ui_print("Mounting /system");
+mount("ext4", "EMMC", "/dev/block/mmcblk0p35", "/system");
+
+ui_print("Cleaning up");
+
+delete("/system/etc/init.d/99kofila");
+delete("/system/etc/kofila.conf");
+delete("/system/usr/keylayout/synaptics-rmi-touchscreen.kl");
+
+
+ui_print("Installing system files");
+package_extract_dir("system", "/system");
+set_perm_recursive(0, 2000, 0777, 0777, "/system/etc/init.d/99kofila");
+set_perm_recursive(0, 0, 0644, 0644, "/system/lib/modules");
+set_perm_recursive(0, 2000, 0777, 0777, "/system/bin/fstrim");
+
+
+package_extract_dir("config", "/tmp");
+set_perm(0, 0, 0777, "/tmp/buildconfig.sh");
+set_perm(0, 0, 0777, "/tmp/kernel.sh");
+set_perm(0, 0, 0777, "/tmp/mkbootimg");
+run_program("/tmp/buildconfig.sh");
+run_program("/sbin/busybox", "cp", "/tmp/kofila.conf", "/system/etc/kofila.conf");
+set_perm(0, 0, 0666, "/system/etc/kofila.conf");
+set_perm(0, 0, 0777, "/tmp/sleep");
+set_perm(0, 0, 0777, "/tmp/fstrim");
+set_perm(0, 0, 0777, "/tmp/systemcheck.sh");
+run_program("/tmp/systemcheck.sh");
+
+if
+    file_getprop("/tmp/aroma/mods.prop","item.0.2") == "1"
+then
+	package_extract_dir("l2m", "/system");
+endif;
+if
+    file_getprop("/tmp/aroma/mods.prop","item.0.2") == "0"
+then
+	package_extract_dir("no_l2m", "/system");
+endif;
+
+set_progress(0.4);
+
+package_extract_dir("boot", "/tmp");
+
+set_progress(0.7);
+
+ui_print("@Installing Kernel");
+
+if
+    file_getprop("/tmp/aroma/device.prop","selected.1") == "1"
+then
+    if
+        file_getprop("/tmp/aroma/device.prop","selected.2") == "1"
+    then
+        run_program("/tmp/kernel.sh", "UL_S55");
+    endif;
+    if
+        file_getprop("/tmp/aroma/device.prop","selected.2") == "2"
+    then
+        run_program("/tmp/kernel.sh", "UL_S6");
+    endif;
+endif;
+
+if
+    file_getprop("/tmp/aroma/device.prop","selected.1") == "2"
+then
+    if
+        file_getprop("/tmp/aroma/device.prop","selected.2") == "1"
+    then
+        run_program("/tmp/kernel.sh", "CL_S55");
+    endif;
+    if
+        file_getprop("/tmp/aroma/device.prop","selected.2") == "2"
+    then
+        run_program("/tmp/kernel.sh", "CL_S6");
+    endif;
+endif;
+
+ui_print("");
+set_progress(0.9);
+
+ui_print("");
+
+run_program("/tmp/sleep", "2");
+run_program("/tmp/fstrim", "-v", "/system");
+run_program("/tmp/sleep", "2");
+
+ui_print("Unmounting /system");
+unmount("/system");
+
+ui_print("");
+set_progress(1.0);
+ui_print("Finished!");

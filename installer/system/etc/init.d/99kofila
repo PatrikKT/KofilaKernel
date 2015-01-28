@@ -1,0 +1,142 @@
+#!/system/bin/sh
+
+KOF_CONF="/system/etc/kofila.conf"
+KOF_LOGFILE="/data/local/tmp/kofila.log"
+
+if [ -f $KOF_LOGFILE ]; then
+  mv $KOF_LOGFILE $KOF_LOGFILE.2;
+fi
+
+echo $(date) >> $KOF_LOGFILE
+
+#Set CPU_FREQ
+echo 384000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq; 
+echo 384000 > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq;
+
+#Set POWERSAVE_BIAS - if using intellidemand governor
+POWERSAVE_BIAS="`cat $KOF_CONF | grep POWERSAVE_BIAS | cut -d '=' -f2`"
+echo $POWERSAVE_BIAS > /sys/devices/system/cpu/cpufreq/intellidemand/powersave_bias
+echo Powersave bias is $POWERSAVE_BIAS >> $KOF_LOGFILE
+
+#Set FASTCHARGE
+if [ "`grep FC=1 $KOF_CONF`" ]; then
+  echo 1 > /sys/kernel/fast_charge/force_fast_charge
+  echo USB Fastcharge enabled >> $KOF_LOGFILE;
+else
+  echo 0 > /sys/kernel/fast_charge/force_fast_charge
+  echo USB Fastcharge disabled >> $KOF_LOGFILE;
+fi
+
+#Set Sweep2wake
+S2W="`grep S2W $KOF_CONF | cut -d '=' -f2`"
+  echo $S2W > /sys/android_touch/sweep2wake
+  echo Sweep2wake $S2W >> $KOF_LOGFILE;
+
+#Set DOUBLETAP2WAKE
+if [ "`grep DT2W=1 $KOF_CONF`" ]; then
+  echo 1 > /sys/android_touch/doubletap2wake;
+  echo DoubleTap2Wake enabled >> $KOF_LOGFILE;
+elif [ "`grep DT2W=2 $KOF_CONF`" ]; then
+  echo 2 > /sys/android_touch/doubletap2wake;
+  echo DoubleTap2Wake fullscreen enabled >> $KOF_LOGFILE;
+else
+  echo 0 > /sys/android_touch/doubletap2wake;
+  echo DoubleTap2Wake disabled >> $KOF_LOGFILE;
+fi
+
+#Set GESTURES
+if [ "`grep WG=1 $KOF_CONF`" ]; then
+  echo 1 > /sys/android_touch/wake_gestures;
+  echo Wake gestures enabled >> $KOF_LOGFILE;
+else
+  echo 0 > /sys/android_touch/wake_gestures;
+  echo Wake gestures disabled >> $KOF_LOGFILE;
+fi
+
+#Set LOGO2WAKE
+if [ "`grep LOGO2WAKE=1 $KOF_CONF`" ]; then
+  echo 1 > /sys/android_touch/logo2wake;
+  echo Logo2Wake enabled >> $KOF_LOGFILE;
+else
+  echo 0 > /sys/android_touch/logo2wake;
+  echo Logo2Wake disabled >> $KOF_LOGFILE;
+fi
+
+#Set VIBRATION
+if [ "`grep VIB=0 $KOF_CONF`" ]; then
+  echo 0 > /sys/android_touch/vib_strength;
+  echo "sleep/wake vibration disabled" >> $KOF_LOGFILE;
+elif [ "`grep VIB=2 $KOF_CONF`" ]; then
+  echo 30 > /sys/android_touch/vib_strength;
+  echo "stronger sleep/wake vibration" >> $KOF_LOGFILE;
+fi
+
+#Set pocket detection
+if [ "`grep POCKET=0 $KOF_CONF`" ]; then
+  echo 0 > /sys/android_touch/pocket_detect;
+  echo Pocket detection disabled >> $KOF_LOGFILE;
+else
+  echo 1 > /sys/android_touch/pocket_detect;
+  echo Pocket detection enabled >> $KOF_LOGFILE;
+fi
+
+#Set Sweep2sleep
+if [ "`grep S2S=1 $KOF_CONF`" ]; then
+  echo 1 > /sys/android_touch/sweep2sleep
+  echo Sweep2sleep right enabled >> $KOF_LOGFILE;
+elif [ "`grep S2S=2 $KOF_CONF`" ]; then
+  echo 2 > /sys/android_touch/sweep2sleep
+  echo Sweep2sleep left enabled >> $KOF_LOGFILE;
+elif [ "`grep S2S=3 $KOF_CONF`" ]; then
+  echo 3 > /sys/android_touch/sweep2sleep
+  echo Sweep2sleep left and right enabled >> $KOF_LOGFILE;
+else
+  echo 0 > /sys/android_touch/sweep2sleep
+  echo Sweep2sleep disabled >> $KOF_LOGFILE;
+fi
+
+#Set LOGO2MENU
+if [ "`grep LOGO2MENU=1 $KOF_CONF`" ]; then
+echo 1 > /sys/android_touch/logo2menu;
+echo logo2menu enabled >> $KOF_LOGFILE;
+else
+echo 0 > /sys/android_touch/logo2menu;
+echo logo2menu disabled >> $KOF_LOGFILE;
+fi
+
+#fstrim
+fstrim -v /cache | tee -a $KOF_LOGFILE;
+fstrim -v /data | tee -a $KOF_LOGFILE;
+
+#io scheduler settings
+SCHED=`grep "SCHED" $KOF_CONF | cut -d '=' -f2`
+if [ "`grep SCHED=1 $KOF_CONF`" ]; then
+  echo cfq > /sys/block/mmcblk0/queue/scheduler;
+  echo CFQ io scheduler >> $KOF_LOGFILE;
+elif [ "`grep SCHED=2 $KOF_CONF`" ]; then
+  echo noop > /sys/block/mmcblk0/queue/scheduler;
+  echo NOOP io scheduler >> $KOF_LOGFILE;
+elif [ "`grep SCHED=4 $KOF_CONF`" ]; then
+  echo fiops > /sys/block/mmcblk0/queue/scheduler;
+  echo FIOPS io scheduler >> $KOF_LOGFILE;
+elif [ "`grep SCHED=5 $KOF_CONF`" ]; then
+  echo sio > /sys/block/mmcblk0/queue/scheduler;
+  echo SIO io scheduler >> $KOF_LOGFILE;
+else
+  echo deadline > /sys/block/mmcblk0/queue/scheduler;
+  echo deadline io scheduler >> $KOF_LOGFILE;
+fi
+
+sleep 25
+
+if [ "`grep LOGO2MENU=1 $KOF_CONF`" ]; then
+  until [ `pidof com.android.systemui` ]; do
+    sleep 1
+  done;
+  setprop persist.sys.navbar.hide true
+fi
+
+#update saved config
+cp /system/etc/kofila.conf /sdcard/.kofila.backup
+
+exit 0

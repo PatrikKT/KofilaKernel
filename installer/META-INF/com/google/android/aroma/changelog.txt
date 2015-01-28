@@ -1,0 +1,21 @@
+v2.2 - 10. 09. 2014
+-New united installer
+-Pocket detection
+-init.d support
+
+v2.1 - 27.08.2014
+-Fixed USB Fastcharge (no more red led when disconnected)
+-Added NTFS RW
+-Added CL support (TESTING)
+
+v2 - 26.08.2014
+-Fixed issue with installing apps on SDCard
+-Fixed WiFi not turning on
+-USB Fastcharge
+-Fixed memory leak in xattr
+
+v1 - 24.08.2014
+-Overclock
+-Additional governors and schedulers
+-Doubletap2Wake and Sweep2Wake
+-Removed write protection 
